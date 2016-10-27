@@ -22,15 +22,7 @@ IFDEntry::IFDEntry() {
 	this->mFieldType = -1;
 	this->mCount = -1;
 	this->mOffsetPtr = -1;
-	//this->mSubIFD = NULL;
 }
-
-// IFDEntry::~IFDEntry() {
-// 	if (this->mSubIFD != NULL) {
-// 		delete this->mSubIFD;
-// 		this->mSubIFD = NULL;
-// 	}
-// }
 
 // Calculated field using the count and size of field type. NOT PORTABLE
 void IFDEntry::setLength() {

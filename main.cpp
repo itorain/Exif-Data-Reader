@@ -7,9 +7,6 @@
 
 using namespace std;
 
-//typedef unsigned char byte;
-const int header_size = 8;
-
 int main(int argc, char* argv[]) {
     // Check args
     if (argc < 2) {
@@ -46,67 +43,8 @@ int main(int argc, char* argv[]) {
     if (gps_data.AltitudeRef == -1) {
         gps_data.Altitude = -gps_data.Altitude;
     }
-    cout << gps_data << endl;
-    // int size = data->mFirstIFD.mEntries.size();
-    // for (int i = 0; i < size; i++) {
-    //     cout << data->mFirstIFD.mEntries.at(i).mRawTag << endl;
-    // }
-    // int j = 22;
-    // for (int i = 10; i < 134; i++) {
-    //     if (i == j) {
-    //         cout << endl;
-    //         j+=12;
-    //     }
-    //     cout << hex << (int)data->mData[i] << " ";
-    // }
-    // cout << endl;
-    // // for (int i = 134; i < 226; i++) {
-    // //     cout << data->mData[i] << " ";
-    // // }
-    // // cout << endl;
-    // // for (int i = 226; i < 318; i++) {
-    // //     cout << data->mData[i] << " ";
-    // // }
-    // //cout << endl;
-    // // for (int i = 356; i < 360; i++) {
-    // //     cout << hex << (int)data->mData[i] << " ";
-    // // }
-    // // IFD for Exifdata mostly camera settings
-    // cout << "IFD for camera settings " << endl;
-    // j=368;
-    // for (int i = 356; i < 780; i++) {
-    //     if (i == j) {
-    //         cout << endl;
-    //         j+=12;
-    //     }
-    //     cout << hex << (int)data->mData[i] << " ";
-    // }
-    // cout << endl;
-    // cout << "IFD for GPS" << endl;
-    // //IFD for GPS data
-    // j=1032;
-    // for (int i = 1020; i < 1132; i++) {
-    //     if (i == j) {
-    //         cout << endl;
-    //         j+=12;
-    //     }
-    //     cout << hex << (int)data->mData[i] << " ";
-    // }
-    // cout << endl;
-    // for (int i = 1132; i < 1156; i++) {
-    //     cout << hex << (int)data->mData[i] << " ";
-    // }
-    // // Other IFD in the photo
-    // cout << "Other IFD" << endl;
-    // j=1250;
-    // for (int i = 1238; i < 1338; i++) {
-    //     if (i == j) {
-    //         cout << endl;
-    //         j+=12;
-    //     }
-    //     cout << hex << (int)data->mData[i] << " ";
-    // }
-    // cout << endl;
 
+    // Print out Coordinates
+    cout << gps_data << endl;
     return 0;
 }
