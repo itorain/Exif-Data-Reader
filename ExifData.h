@@ -9,6 +9,7 @@
 
 typedef unsigned char byte;
 
+// Struct to hold a rational value so that is can be easily cast to a double
 struct Rational {
 	uint32_t numerator, denominator;
 	operator double() const {
@@ -19,6 +20,7 @@ struct Rational {
 	}
 };
 
+// Struct to hold GPS data. Used to hold information in a nice friendly way
 struct Geolocation {
 	double Latitude;
 	double Longitude;
@@ -57,7 +59,7 @@ struct Geolocation {
 // Class to hold the byte order (i.e. little endian or big endian)
 class Base {
 public:
-	bool mEndianFlag;
+	bool mEndianFlag; // Endianness flag. True is Little Endian and False is Big
 };
 
 // Class to represent the 12 byte Image file directory entries.
@@ -66,12 +68,12 @@ public:
 
 //**** Member Variables ****//
 
-	uint16_t mTag;
-	byte mRawTag [2];
-	uint16_t mFieldType; //
+	uint16_t mTag; // Tag value
+	byte mRawTag [2]; // Raw tag stored in 2 bytes
+	uint16_t mFieldType; // The field type of the data. Determines size of data
 	uint32_t mCount; // The number of the specified field type.
-    uint32_t mOffsetPtr;
-	byte mRawValueOffset [4];
+    uint32_t mOffsetPtr; // Offset from beginning of data to where value starts. OR the actual data value
+	byte mRawValueOffset [4]; // 4 byte offset value needed to compute when value is stored in here
 	unsigned int mLength; // Length of the value in the number of bytes
 	// Vectors of different types to hold different value fieldtype values
 	// Apparently I can not declare a generic vector here (vector<T> mParsedValue)
@@ -90,8 +92,7 @@ public:
 
 //**** Constructors ****//
 
-	IFDEntry();
-	//~IFDEntry();
+	IFDEntry(); // Default empty constructor
 
 //**********************//
 
@@ -106,24 +107,21 @@ void count(int count) { mCount = count; }
 uint32_t offsetVal() const { return mOffsetPtr; }
 void offsetVal(int offsetVal) { mOffsetPtr = offsetVal; }
 unsigned int length() const { return mLength; }
-void setLength();
+void setLength(); // Set the length of the vector based on the count data size
 
-void parseIFDInfo(const byte*, const byte*);
-void parseValue(const byte*, const byte*);
+void parseIFDInfo(const byte*, const byte*); // Sets entry data values
+void parseValue(const byte*, const byte*); // helper function to pass data to parse function below
 
-void parseUByte(const byte*, const byte*);
-void parseUShort(const byte*, const byte*);
-void parseULong(const byte*, const byte*);
-void parseChar(const byte*, const byte*);
-void parseRational(const byte*, const byte*);
-void parseFloat(const byte*, const byte*);
-void parseDouble(const byte*, const byte*);
-void parseByte(const byte*, const byte*);
-void parseShort(const byte*, const byte*);
-void parseLong(const byte*, const byte*);
-
-
-
+void parseUByte(const byte*, const byte*); // Parse unsigned byte values
+void parseUShort(const byte*, const byte*); // Parse unsigned short values
+void parseULong(const byte*, const byte*); // Parse unsigned 4 byte Long
+void parseChar(const byte*, const byte*); // Parse unsigned char values
+void parseRational(const byte*, const byte*); // Parse 2 long values into Rational struct (signed or unsigned)
+void parseFloat(const byte*, const byte*); // Parse 4 byte float values
+void parseDouble(const byte*, const byte*); // Parse 8 byte double values
+void parseByte(const byte*, const byte*); // Parse signed 1 byte values
+void parseShort(const byte*, const byte*); // Parse signed  2 byte short values
+void parseLong(const byte*, const byte*); // Parse signed 4 byte long values
 
 //**************************************//
 private:
@@ -140,23 +138,21 @@ public:
 	uint16_t mNumEntries; // 2 byte count of the number of entries.
 	std::vector<IFDEntry> mEntries; // will be of size count*12;
 	uint32_t mNextIFD; // 4 btye offset to the next IFD from beginning of file.
-	bool mContainsSubDirectories;
+	bool mContainsSubDirectories; // Whether or not this IFD holds sub IFDs
 	// add a generic to hold the type
 
 //**************************//
 
 //**** Constructors ****//
 
-	IFD();
-	IFD(unsigned int, bool, const byte*);
-	//~IFD();
+	IFD(); // default constructor
+	IFD(unsigned int, bool, const byte*); // Initialize with endianness, and set the number of entries
 
 //**********************//
 
-	void setNumEntries();
-	bool readEntries(const byte*, const byte*);
-
 //**** Functions to operate on data ****//
+
+	bool readEntries(const byte*, const byte*); // Add Image File Directory entries to vector
 
 //**************************************//
 };
@@ -174,23 +170,23 @@ public:
 
 //**** Constructors/Desstructor ****//
 
-	ExifData();
-	~ExifData();
+	ExifData(); // Default constructor values are set via readIn
+	~ExifData(); // Desstructor to delete data
 
 //**********************//
 
 //**** Member functions ****//
 
-	bool readIn(std::ifstream&);
-	bool readHeader(std::ifstream&, byte*);
-	bool readIFDs(int);
-	bool readSubIFDs(const IFD&);
+	bool readIn(std::ifstream&); // Read in data to memory
+	bool readHeader(std::ifstream&, byte*); // Parse header
+	bool readIFDs(int); // Parse Image file directory
+	bool readSubIFDs(const IFD&); // Parse sub IFDs like GPS and Exif
 
 
 //**************************************//
 };
 
-int hexToInt(const byte*, bool, int size = 4); // Parse 2 or 4 bytes
-float hexToFloat(const byte*, bool);
+int hexToInt(const byte*, bool, int size = 4); // Parse 2 or 4 bytes to get an integer
+float hexToFloat(const byte*, bool); // parse bytes to floats
 
 #endif //ExifData
