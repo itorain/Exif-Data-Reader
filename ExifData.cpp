@@ -149,7 +149,13 @@ void IFDEntry::parseValue(const byte* buf, const byte* tiff_head) {
 // Add unsigned btye values to vector
 void IFDEntry::parseUByte(const byte* buf, const byte* tiff_head) {
 	if (this->mLength <= 4) {
-		this->mParsedUByte.push_back(static_cast<uint8_t>(this->mOffsetPtr)); // store value in vector
+		if (this->mEndianFlag) {
+			this->mParsedUByte.push_back(static_cast<uint8_t>(this->mOffsetPtr)); // store value in vector
+		}
+		else {
+			this->mOffsetPtr = static_cast<uint32_t>(hexToInt(buf, true)); // when value is stored in 4 byte offset it is stored as little endian
+			this->mParsedUByte.push_back(static_cast<uint8_t>(this->mOffsetPtr));
+		}
 	}
 	else {
 		buf = tiff_head + this->mOffsetPtr; // Offset of data values are from start of file
@@ -162,7 +168,13 @@ void IFDEntry::parseUByte(const byte* buf, const byte* tiff_head) {
 // Add unsigned 2 byte shorts to vector
 void IFDEntry::parseUShort(const byte* buf, const byte* tiff_head) {
 	if (this->mLength <= 4) {
-		this->mParsedUShort.push_back(static_cast<uint16_t>(this->mOffsetPtr)); // store value in vector
+		if (this->mEndianFlag) {
+			this->mParsedUShort.push_back(static_cast<uint16_t>(this->mOffsetPtr)); // store value in vector
+		}
+		else {
+			this->mOffsetPtr = static_cast<uint32_t>(hexToInt(buf, true)); // when value is stored in 4 byte offset it is stored as little endian
+			this->mParsedUShort.push_back(static_cast<uint16_t>(this->mOffsetPtr));
+		}
 	}
 	else {
 		buf = tiff_head + this->mOffsetPtr; // Offset of data values are from start of file
@@ -177,7 +189,13 @@ void IFDEntry::parseUShort(const byte* buf, const byte* tiff_head) {
 // Add unsigned 4 byte longs to vector
 void IFDEntry::parseULong(const byte* buf, const byte* tiff_head) {
 	if (this->mLength <= 4) {
-		this->mParsedULong.push_back(static_cast<uint32_t>(this->mOffsetPtr)); // store value in vector
+		if (this->mEndianFlag) {
+			this->mParsedULong.push_back(static_cast<uint32_t>(this->mOffsetPtr)); // store value in vector
+		}
+		else {
+			this->mOffsetPtr = static_cast<uint32_t>(hexToInt(buf, true));
+			this->mParsedULong.push_back(this->mOffsetPtr);
+		}
 	}
 	else {
 		buf = tiff_head + this->mOffsetPtr; // Offset of data values are from start of file
@@ -246,7 +264,13 @@ void IFDEntry::parseDouble(const byte* buf, const byte* tiff_head) {
 // add an unsigned byte to vector
 void IFDEntry::parseByte(const byte* buf, const byte* tiff_head) {
 	if (this->mLength <= 4) {
-		this->mParsedByte.push_back(static_cast<int8_t>(this->mOffsetPtr)); // store value in vector
+		if (this->mEndianFlag) {
+			this->mParsedByte.push_back(static_cast<int8_t>(this->mOffsetPtr)); // store value in vector
+		}
+		else {
+			this->mOffsetPtr = static_cast<uint32_t>(hexToInt(buf, true)); // when value is stored in 4 byte offset it is stored as little endian
+			this->mParsedUByte.push_back(static_cast<int8_t>(this->mOffsetPtr));
+		}
 	}
 	else {
 		buf = tiff_head + this->mOffsetPtr; // Offset of data values are from start of file
@@ -258,7 +282,13 @@ void IFDEntry::parseByte(const byte* buf, const byte* tiff_head) {
 
 void IFDEntry::parseShort(const byte* buf, const byte* tiff_head) {
 	if (this->mLength <= 4) {
-		this->mParsedShort.push_back(static_cast<int16_t>(this->mOffsetPtr)); // store value in vector
+		if (this->mEndianFlag) {
+			this->mParsedShort.push_back(static_cast<int16_t>(this->mOffsetPtr)); // store value in vector
+		}
+		else {
+			this->mOffsetPtr = static_cast<int32_t>(hexToInt(buf, true)); // when value is stored in 4 byte offset it is stored as little endian
+			this->mParsedUShort.push_back(static_cast<int16_t>(this->mOffsetPtr));
+		}
 	}
 	else {
 		buf = tiff_head + this->mOffsetPtr; // Offset of data values are from start of file
@@ -272,7 +302,13 @@ void IFDEntry::parseShort(const byte* buf, const byte* tiff_head) {
 
 void IFDEntry::parseLong(const byte* buf, const byte* tiff_head) {
 	if (this->mLength <= 4) {
-		this->mParsedLong.push_back(static_cast<int32_t>(this->mOffsetPtr)); // store value in vector
+		if (this->mEndianFlag) {
+			this->mParsedLong.push_back(static_cast<int32_t>(this->mOffsetPtr)); // store value in vector
+		}
+		else {
+			this->mOffsetPtr = static_cast<int32_t>(hexToInt(buf, true)); // when value is stored in 4 byte offset it is stored as little endian
+			this->mParsedUShort.push_back(this->mOffsetPtr);
+		}
 	}
 	else {
 		buf = tiff_head + this->mOffsetPtr; // Offset of data values are from start of file
@@ -318,6 +354,7 @@ bool IFD::readEntries(const byte* data, const byte* tiff_head) {
 		entry.mEndianFlag = this->mEndianFlag;
 		entry.parseIFDInfo(data, tiff_head);
 		if (entry.mTag == 0x8825 || entry.mTag == 0x8769) {
+			entry.mOffsetPtr = hexToInt(entry.mRawValueOffset, this->mEndianFlag); // since this technically fits into 4 bytes the value has to be recalculated.
 			this->mContainsSubDirectories = true;
 		}
 		this->mEntries.push_back(entry);

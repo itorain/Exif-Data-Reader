@@ -12,10 +12,10 @@ exifRead: $(OBJS)
 	$(CC) $(OBJS) -o exifRead
 
 ExifData.o: ExifData.cpp $(DEPS)
-	$(CC) $(FLAGS) ExifData.cpp
+	$(CC) $(DEBUG) ExifData.cpp
 
 main.o: main.cpp
-	$(CC) $(FLAGS) main.cpp
+	$(CC) $(DEBUG) main.cpp
 
 clean:
 	-rm -f *.o exifRead *.tar *~
